@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { getGitHubClient, fetchIssues, JULES_LABEL } from "@/lib/github";
+import { getGitHubClient, fetchIssues, JULES_LABEL, GitHubIssue } from "@/lib/github";
 import { CreateIssueDialog } from "@/components/issues/CreateIssueDialog";
 import {
   Loader2,
@@ -28,16 +28,17 @@ export default function RepoPage() {
   const owner = params.owner as string;
   const repo = params.repo as string;
 
-  const [issues, setIssues] = useState<any[]>([]);
+  const [issues, setIssues] = useState<GitHubIssue[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loadIssues = async () => {
-    if (session?.accessToken && owner && repo) {
+  const loadIssues = useCallback(async () => {
+    const accessToken = session?.accessToken as string | undefined;
+    if (accessToken && owner && repo) {
       setLoading(true);
       try {
-        const octokit = getGitHubClient(session.accessToken);
+        const octokit = getGitHubClient(accessToken);
         const data = await fetchIssues(octokit, owner, repo);
-        setIssues(data);
+        setIssues(data as unknown as GitHubIssue[]);
       } catch (error) {
         console.error("Failed to fetch issues:", error);
       } finally {
@@ -48,7 +49,7 @@ export default function RepoPage() {
 
   useEffect(() => {
     loadIssues();
-  }, [session?.accessToken, owner, repo]);
+  }, [loadIssues]);
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
@@ -73,7 +74,9 @@ export default function RepoPage() {
             <CreateIssueDialog
               owner={owner}
               repo={repo}
-              onSuccess={loadIssues}
+              onSuccess={(newIssue) => {
+                setIssues((prev) => [newIssue, ...prev]);
+              }}
             />
           </header>
 
@@ -117,7 +120,7 @@ export default function RepoPage() {
                               {issue.title}
                             </h3>
                             <div className="flex items-center gap-1.5 flex-wrap">
-                              {issue.labels.map((label: any) => (
+                              {issue.labels.map((label) => (
                                 <Badge
                                   key={label.id}
                                   variant="outline"

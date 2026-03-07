@@ -16,14 +16,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Plus, Loader2, Sparkles, Github } from "lucide-react";
-import { getGitHubClient, createJulesIssue } from "@/lib/github";
-import { useRouter } from "next/navigation";
+import { getGitHubClient, createJulesIssue, GitHubIssue } from "@/lib/github";
 import { Badge } from "@/components/ui/badge";
 
 interface CreateIssueDialogProps {
   owner: string;
   repo: string;
-  onSuccess?: () => void;
+  onSuccess?: (issue: GitHubIssue) => void;
 }
 
 export function CreateIssueDialog({
@@ -36,7 +35,6 @@ export function CreateIssueDialog({
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,13 +43,12 @@ export function CreateIssueDialog({
     setLoading(true);
     try {
       const octokit = getGitHubClient(session.accessToken);
-      await createJulesIssue(octokit, owner, repo, title, body);
+      const response = await createJulesIssue(octokit, owner, repo, title, body);
 
       setOpen(false);
       setTitle("");
       setBody("");
-      onSuccess?.();
-      router.refresh();
+      onSuccess?.(response.data as unknown as GitHubIssue);
     } catch (error) {
       console.error("Failed to create issue:", error);
     } finally {
