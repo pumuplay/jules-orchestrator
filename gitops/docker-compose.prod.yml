@@ -7,14 +7,12 @@ services:
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - NEXTAUTH_URL=${NEXTAUTH_URL}
     networks:
-      - caddy_network
-    deploy:
-      labels:
-        caddy: ${DOMAIN}
-        caddy.reverse_proxy: "{{upstreams 3000}}"
-      restart_policy:
-        condition: on-failure
+      - caddy_net
+    labels:
+      caddy: ${DOMAIN}
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+    restart: always
 
 networks:
-  caddy_network:
+  caddy_net:
     external: true
