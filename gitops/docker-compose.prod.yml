@@ -1,9 +1,6 @@
 services:
   app:
     image: ghcr.io/${GH_OWNER}/jules-orchestrator:latest
-    build:
-      context: ..
-      dockerfile: gitops/Dockerfile
     environment:
       - GH_CLIENT_ID=${GH_CLIENT_ID}
       - GH_SECRET=${GH_SECRET}
