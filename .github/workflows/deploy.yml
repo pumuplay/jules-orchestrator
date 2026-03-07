@@ -66,9 +66,9 @@ jobs:
           standalone: true
           file: gitops/docker-compose.prod.yml
           env_data: |
-            GH_OWNER=${{ github.repository_owner }}
-            GH_CLIENT_ID=${{ secrets.GH_CLIENT_ID }}
-            GH_SECRET=${{ secrets.GH_SECRET }}
-            NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
-            NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}
-            DOMAIN=${{ secrets.DOMAIN }}
+            GH_OWNER: ${{ github.repository_owner }}
+            GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
+            GH_SECRET: ${{ secrets.GH_SECRET }}
+            NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+            NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+            DOMAIN: ${{ secrets.DOMAIN }}
