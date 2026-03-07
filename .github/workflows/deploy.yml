@@ -54,12 +54,12 @@ jobs:
       - name: Deploy to Portainer
         uses: cssnr/portainer-stack-deploy-action@v1
         with:
-          portainer_url: ${{ secrets.PORTAINER_URL }}
-          portainer_api_token: ${{ secrets.PORTAINER_TOKEN }}
-          endpoint_id: ${{ secrets.PORTAINER_ENDPOINT_ID || 1 }}
-          stack_name: "jules-orchestrator"
+          url: ${{ secrets.PORTAINER_URL }}
+          token: ${{ secrets.PORTAINER_TOKEN }}
+          endpoint: ${{ secrets.PORTAINER_ENDPOINT_ID || 1 }}
+          name: "jules-orchestrator"
           file: gitops/docker-compose.prod.yml
-          env: |
+          env_data: |
             GH_OWNER=${{ github.repository_owner }}
             GH_CLIENT_ID=${{ secrets.GH_CLIENT_ID }}
             GH_SECRET=${{ secrets.GH_SECRET }}
