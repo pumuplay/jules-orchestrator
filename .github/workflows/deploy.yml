@@ -51,6 +51,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Prepare Docker Compose File
+        run: |
+          sed -i 's/${GH_OWNER}/${{ github.repository_owner }}/g' gitops/docker-compose.prod.yml
+
       - name: Deploy to Portainer
         uses: cssnr/portainer-stack-deploy-action@v1
         with:
