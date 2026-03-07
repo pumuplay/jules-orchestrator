@@ -58,7 +58,7 @@ jobs:
           token: ${{ secrets.PORTAINER_TOKEN }}
           endpoint: ${{ secrets.PORTAINER_ENDPOINT_ID || 1 }}
           name: "jules-orchestrator"
-          type: 2
+          type: "file"
           file: gitops/docker-compose.prod.yml
           env_data: |
             GH_OWNER=${{ github.repository_owner }}
