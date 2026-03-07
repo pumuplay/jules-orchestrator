@@ -15,10 +15,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Plus, Loader2, Sparkles, Github } from "lucide-react";
+import { Plus, Loader2, Sparkles, Github, AlertCircle } from "lucide-react";
 import { getGitHubClient, createJulesIssue } from "@/lib/github";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface CreateIssueDialogProps {
   owner: string;
@@ -36,6 +37,7 @@ export function CreateIssueDialog({
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,6 +46,7 @@ export function CreateIssueDialog({
 
     setLoading(true);
     try {
+      setError(null);
       const octokit = getGitHubClient(session.accessToken);
       await createJulesIssue(octokit, owner, repo, title, body);
 
@@ -52,8 +55,12 @@ export function CreateIssueDialog({
       setBody("");
       onSuccess?.();
       router.refresh();
-    } catch (error) {
-      console.error("Failed to create issue:", error);
+    } catch (err: any) {
+      console.error("Failed to create issue:", err);
+      setError(
+        err?.message ||
+          "An unexpected error occurred while creating the issue.",
+      );
     } finally {
       setLoading(false);
     }
@@ -85,6 +92,19 @@ export function CreateIssueDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 py-4">
+          {error && (
+            <Alert
+              variant="destructive"
+              className="bg-destructive/10 border-destructive/20 text-destructive-foreground animate-in fade-in zoom-in duration-200"
+            >
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription className="text-xs opacity-90">
+                {error}
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="title">Title</Label>
