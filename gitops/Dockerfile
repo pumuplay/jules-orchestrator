@@ -1,11 +1,11 @@
-# Use the official Bun image
-FROM oven/bun:latest AS base
+# Use the official Bun image (stable 1.x)
+FROM oven/bun:1 AS base
 
 # Install dependencies only when needed
 FROM base AS deps
 WORKDIR /app
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Rebuild the source code only when needed
 FROM base AS builder
