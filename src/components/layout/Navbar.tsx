@@ -40,7 +40,7 @@ export function Navbar() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => signOut()}
+                onClick={() => signOut({ callbackUrl: "/" })}
                 className="text-muted-foreground hover:text-destructive"
               >
                 <LogOut className="h-5 w-5" />
