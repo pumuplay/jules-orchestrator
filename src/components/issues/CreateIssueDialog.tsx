@@ -61,12 +61,14 @@ export function CreateIssueDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2 shadow-[0_0_15px_rgba(57,255,20,0.15)] hover:shadow-[0_0_25px_rgba(57,255,20,0.25)] transition-all">
-          <Plus className="h-4 w-4" />
-          Create New Issue
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          <Button className="gap-2 shadow-[0_0_15px_rgba(57,255,20,0.15)] hover:shadow-[0_0_25px_rgba(57,255,20,0.25)] transition-all">
+            <Plus className="h-4 w-4" />
+            Create New Issue
+          </Button>
+        }
+      />
       <DialogContent className="sm:max-w-[500px] border-primary/20 bg-background/95 backdrop-blur-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
