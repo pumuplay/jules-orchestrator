@@ -111,11 +111,11 @@ export const fetchRepos = async (octokit: Octokit): Promise<GitHubRepo[]> => {
   return data as unknown as GitHubRepo[];
 };
 
-export const searchRepos = async (octokit: Octokit, query: string): Promise<GitHubRepo[]> => {
+export const searchUserRepos = async (octokit: Octokit, query: string): Promise<GitHubRepo[]> => {
   const { data } = await octokit.search.repos({
-    q: query,
+    q: `${query} user:@me`,
     sort: "updated",
-    per_page: 20,
+    per_page: 50,
   });
   return data.items as unknown as GitHubRepo[];
 };

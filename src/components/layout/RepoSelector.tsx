@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import {
   getGitHubClient,
   fetchRepos,
   fetchOrganizations,
-  searchRepos,
+  searchUserRepos,
   GitHubRepo,
   GitHubOrg,
 } from "@/lib/github";
@@ -38,49 +38,66 @@ export function RepoSelector() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searching, setSearching] = useState(false);
 
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const currentOwner = params.owner as string;
   const currentRepo = params.repo as string;
   const fullPath = currentOwner && currentRepo ? `${currentOwner}/${currentRepo}` : null;
 
-  useEffect(() => {
-    async function loadInitialData() {
-      if (session?.accessToken) {
-        try {
-          const octokit = getGitHubClient(session.accessToken as string);
-          const [repoData, orgData] = await Promise.all([
-            fetchRepos(octokit),
-            fetchOrganizations(octokit),
-          ]);
-          setRepos(repoData);
-          setOrgs(orgData);
-        } catch (error) {
-          console.error("Failed to fetch initial data:", error);
-        }
+  const loadInitialData = useCallback(async () => {
+    if (session?.accessToken) {
+      try {
+        const octokit = getGitHubClient(session.accessToken as string);
+        const [repoData, orgData] = await Promise.all([
+          fetchRepos(octokit),
+          fetchOrganizations(octokit),
+        ]);
+        setRepos(repoData);
+        setOrgs(orgData);
+      } catch (error) {
+        console.error("Failed to fetch initial data:", error);
       }
     }
-    loadInitialData();
   }, [session?.accessToken]);
 
-  const handleSearch = useCallback(async (query: string) => {
-    setSearchQuery(query);
-    if (query.length < 3) return;
+  useEffect(() => {
+    loadInitialData();
+  }, [loadInitialData]);
+
+  const performSearch = useCallback(async (query: string) => {
+    if (!query) {
+      loadInitialData();
+      return;
+    }
 
     setSearching(true);
     try {
       const octokit = getGitHubClient(session?.accessToken as string);
-      const searchResults = await searchRepos(octokit, query);
-      // Merge unique results
-      setRepos((prev) => {
-        const existingIds = new Set(prev.map((r) => r.id));
-        const newOnes = searchResults.filter((r) => !existingIds.has(r.id));
-        return [...prev, ...newOnes];
-      });
+      const searchResults = await searchUserRepos(octokit, query);
+      setRepos(searchResults);
     } catch (error) {
       console.error("Search failed:", error);
     } finally {
       setSearching(false);
     }
-  }, [session?.accessToken]);
+  }, [session?.accessToken, loadInitialData]);
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (query.length === 0) {
+      loadInitialData();
+      return;
+    }
+
+    searchTimeoutRef.current = setTimeout(() => {
+      performSearch(query);
+    }, 500);
+  };
 
   const onSelect = (path: string) => {
     setOpen(false);
@@ -112,9 +129,9 @@ export function RepoSelector() {
         }
       />
       <PopoverContent className="w-[320px] p-0" align="start">
-        <Command className="bg-background" shouldFilter={!searchQuery}>
+        <Command className="bg-background" shouldFilter={false}>
           <CommandInput
-            placeholder="Search repositories..."
+            placeholder="Search your repositories..."
             onValueChange={handleSearch}
           />
           <CommandList>
@@ -124,6 +141,7 @@ export function RepoSelector() {
               </div>
             )}
             <CommandEmpty>No repository found.</CommandEmpty>
+
             <CommandGroup heading="Personal Repositories">
               {repos
                 .filter((r) => !r.owner.type.includes("Organization"))
@@ -145,11 +163,14 @@ export function RepoSelector() {
                   </CommandItem>
                 ))}
             </CommandGroup>
-            {orgs.map((org) => (
-              <CommandGroup key={org.id} heading={org.login}>
-                {repos
-                  .filter((r) => r.owner.login === org.login)
-                  .map((repo) => (
+
+            {orgs.map((org) => {
+              const orgRepos = repos.filter((r) => r.owner.login === org.login);
+              if (orgRepos.length === 0 && !searchQuery) return null;
+
+              return (
+                <CommandGroup key={org.id} heading={org.login}>
+                  {orgRepos.map((repo) => (
                     <CommandItem
                       key={repo.id}
                       value={repo.full_name}
@@ -166,8 +187,9 @@ export function RepoSelector() {
                       <span className="truncate">{repo.full_name}</span>
                     </CommandItem>
                   ))}
-              </CommandGroup>
-            ))}
+                </CommandGroup>
+              );
+            })}
           </CommandList>
         </Command>
       </PopoverContent>
