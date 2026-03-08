@@ -20,6 +20,7 @@ import { getGitHubClient, createJulesIssue, GitHubIssue } from "@/lib/github";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { RequestError } from "@octokit/request-error";
 
 interface CreateIssueDialogProps {
   owner: string;
@@ -47,7 +48,7 @@ export function CreateIssueDialog({
     setLoading(true);
     try {
       setError(null);
-      const octokit = getGitHubClient(session.accessToken);
+      const octokit = getGitHubClient(session.accessToken as string);
       const response = await createJulesIssue(
         octokit,
         owner,
@@ -61,12 +62,15 @@ export function CreateIssueDialog({
       setBody("");
       onSuccess?.(response.data as unknown as GitHubIssue);
       router.refresh();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to create issue:", err);
-      setError(
-        err?.message ||
-          "An unexpected error occurred while creating the issue.",
-      );
+      if (err instanceof RequestError) {
+        setError(err.message);
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred while creating the issue.");
+      }
     } finally {
       setLoading(false);
     }

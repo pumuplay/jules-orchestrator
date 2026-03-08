@@ -5,7 +5,6 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Button } from "@/components/ui/button";
 import {
-  Github,
   Rocket,
   Github as GithubIcon,
   ShieldCheck,
@@ -114,7 +113,7 @@ export default function Home() {
             Select a Repository
           </h2>
           <p className="text-muted-foreground max-w-md">
-            Choose a repository from the sidebar to view and manage its issues.
+            Choose a repository from the navbar to view and manage its issues.
             New issues created here will be automatically tagged with the{" "}
             <span className="text-primary font-mono bg-primary/10 px-1.5 py-0.5 rounded">
               jules
