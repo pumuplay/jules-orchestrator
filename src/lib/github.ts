@@ -104,34 +104,29 @@ export const createJulesIssue = async (
 };
 
 export const fetchRepos = async (octokit: Octokit): Promise<GitHubRepo[]> => {
-  // listForAuthenticatedUser returns repos the user has access to,
-  // including those in organizations where they are a member.
-  const { data } = await octokit.repos.listForAuthenticatedUser({
+  // paginate returns ALL repositories the user has access to across all pages.
+  // This ensures the search box can find any repo with proper permissions.
+  const repos = await octokit.paginate(octokit.repos.listForAuthenticatedUser, {
     sort: "updated",
     per_page: 100,
     affiliation: "owner,collaborator,organization_member",
   });
-  return data as unknown as GitHubRepo[];
+  return repos as unknown as GitHubRepo[];
 };
 
-export const searchUserRepos = async (octokit: Octokit, query: string): Promise<GitHubRepo[]> => {
-  // We use search.repos but ensure it's limited to the user's visible repos
-  const { data } = await octokit.search.repos({
-    q: `${query} in:name is:internal,public,private`,
-    sort: "updated",
-    per_page: 50,
-  });
-  return data.items as unknown as GitHubRepo[];
-};
-
-export const fetchOrganizations = async (octokit: Octokit): Promise<GitHubOrg[]> => {
+export const fetchOrganizations = async (
+  octokit: Octokit,
+): Promise<GitHubOrg[]> => {
   const { data } = await octokit.orgs.listForAuthenticatedUser({
     per_page: 100,
   });
   return data as unknown as GitHubOrg[];
 };
 
-export const fetchOrgRepos = async (octokit: Octokit, org: string): Promise<GitHubRepo[]> => {
+export const fetchOrgRepos = async (
+  octokit: Octokit,
+  org: string,
+): Promise<GitHubRepo[]> => {
   const { data } = await octokit.repos.listForOrg({
     org,
     sort: "updated",

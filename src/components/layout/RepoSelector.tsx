@@ -25,7 +25,14 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronsUpDown, Folder, Building2, User, Loader2 } from "lucide-react";
+import {
+  Check,
+  ChevronsUpDown,
+  Folder,
+  Building2,
+  User,
+  Loader2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function RepoSelector() {
@@ -36,16 +43,16 @@ export function RepoSelector() {
   const [repos, setRepos] = useState<GitHubRepo[]>([]);
   const [orgs, setOrgs] = useState<GitHubOrg[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searching, setSearching] = useState(false);
-
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const currentOwner = params.owner as string;
   const currentRepo = params.repo as string;
-  const fullPath = currentOwner && currentRepo ? `${currentOwner}/${currentRepo}` : null;
+  const fullPath =
+    currentOwner && currentRepo ? `${currentOwner}/${currentRepo}` : null;
 
   const loadInitialData = useCallback(async () => {
     if (session?.accessToken) {
+      setLoading(true);
       try {
         const octokit = getGitHubClient(session.accessToken as string);
         const [repoData, orgData] = await Promise.all([
@@ -56,6 +63,8 @@ export function RepoSelector() {
         setOrgs(orgData);
       } catch (error) {
         console.error("Failed to fetch initial data:", error);
+      } finally {
+        setLoading(false);
       }
     }
   }, [session?.accessToken]);
@@ -64,39 +73,8 @@ export function RepoSelector() {
     loadInitialData();
   }, [loadInitialData]);
 
-  const performSearch = useCallback(async (query: string) => {
-    if (!query) {
-      loadInitialData();
-      return;
-    }
-
-    setSearching(true);
-    try {
-      const octokit = getGitHubClient(session?.accessToken as string);
-      const searchResults = await searchUserRepos(octokit, query);
-      setRepos(searchResults);
-    } catch (error) {
-      console.error("Search failed:", error);
-    } finally {
-      setSearching(false);
-    }
-  }, [session?.accessToken, loadInitialData]);
-
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-
-    if (query.length === 0) {
-      loadInitialData();
-      return;
-    }
-
-    searchTimeoutRef.current = setTimeout(() => {
-      performSearch(query);
-    }, 500);
   };
 
   const onSelect = (path: string) => {
@@ -121,7 +99,9 @@ export function RepoSelector() {
                   <span className="truncate font-medium">{fullPath}</span>
                 </>
               ) : (
-                <span className="text-muted-foreground">Select repository...</span>
+                <span className="text-muted-foreground">
+                  Select repository...
+                </span>
               )}
             </div>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -129,13 +109,13 @@ export function RepoSelector() {
         }
       />
       <PopoverContent className="w-[320px] p-0" align="start">
-        <Command className="bg-background" shouldFilter={false}>
+        <Command className="bg-background" shouldFilter={true}>
           <CommandInput
             placeholder="Search your repositories..."
             onValueChange={handleSearch}
           />
           <CommandList>
-            {searching && (
+            {loading && (
               <div className="p-4 flex items-center justify-center">
                 <Loader2 className="h-4 w-4 animate-spin text-primary" />
               </div>
@@ -155,7 +135,9 @@ export function RepoSelector() {
                     <Check
                       className={cn(
                         "h-4 w-4",
-                        fullPath === repo.full_name ? "opacity-100" : "opacity-0"
+                        fullPath === repo.full_name
+                          ? "opacity-100"
+                          : "opacity-0",
                       )}
                     />
                     <User className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -164,12 +146,21 @@ export function RepoSelector() {
                 ))}
             </CommandGroup>
 
-            {orgs.map((org) => {
-              const orgRepos = repos.filter((r) => r.owner.login === org.login);
+            {/* Organizations from membership or search results */}
+            {Array.from(
+              new Set([
+                ...orgs.map((o) => o.login),
+                ...repos
+                  .filter((r) => r.owner.type.includes("Organization"))
+                  .map((r) => r.owner.login),
+              ]),
+            ).map((orgLogin) => {
+              const orgRepos = repos.filter((r) => r.owner.login === orgLogin);
               if (orgRepos.length === 0 && !searchQuery) return null;
+              if (orgRepos.length === 0 && searchQuery) return null;
 
               return (
-                <CommandGroup key={org.id} heading={org.login}>
+                <CommandGroup key={orgLogin} heading={orgLogin}>
                   {orgRepos.map((repo) => (
                     <CommandItem
                       key={repo.id}
@@ -180,7 +171,9 @@ export function RepoSelector() {
                       <Check
                         className={cn(
                           "h-4 w-4",
-                          fullPath === repo.full_name ? "opacity-100" : "opacity-0"
+                          fullPath === repo.full_name
+                            ? "opacity-100"
+                            : "opacity-0",
                         )}
                       />
                       <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
