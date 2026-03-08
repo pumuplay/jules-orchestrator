@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Plus, Loader2, Sparkles, Github, AlertCircle } from "lucide-react";
-import { getGitHubClient, createJulesIssue } from "@/lib/github";
+import { getGitHubClient, createJulesIssue, GitHubIssue } from "@/lib/github";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -24,7 +24,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 interface CreateIssueDialogProps {
   owner: string;
   repo: string;
-  onSuccess?: () => void;
+  onSuccess?: (issue: GitHubIssue) => void;
 }
 
 export function CreateIssueDialog({
@@ -48,7 +48,7 @@ export function CreateIssueDialog({
     try {
       setError(null);
       const octokit = getGitHubClient(session.accessToken);
-      await createJulesIssue(octokit, owner, repo, title, body);
+      const response = await createJulesIssue(octokit, owner, repo, title, body);
 
       setOpen(false);
       setTitle("");

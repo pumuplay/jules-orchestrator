@@ -1,5 +1,30 @@
 import { Octokit } from "@octokit/rest";
 
+export interface GitHubUser {
+  login: string;
+  avatar_url: string;
+}
+
+export interface GitHubLabel {
+  id: number;
+  name: string;
+  color: string;
+}
+
+export interface GitHubIssue {
+  id: number;
+  number: number;
+  title: string;
+  state: string;
+  html_url: string;
+  user: GitHubUser;
+  labels: GitHubLabel[];
+  created_at: string;
+  updated_at: string;
+  comments: number;
+  body?: string | null;
+}
+
 export const getGitHubClient = (accessToken: string) => {
   return new Octokit({
     auth: accessToken,
@@ -19,8 +44,8 @@ export const ensureJulesLabel = async (
       repo,
       name: JULES_LABEL,
     });
-  } catch (error: any) {
-    if (error.status === 404) {
+  } catch (error: unknown) {
+    if (typeof error === "object" && error !== null && "status" in error && error.status === 404) {
       await octokit.issues.createLabel({
         owner,
         repo,
