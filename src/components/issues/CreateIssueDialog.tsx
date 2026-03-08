@@ -48,12 +48,18 @@ export function CreateIssueDialog({
     try {
       setError(null);
       const octokit = getGitHubClient(session.accessToken);
-      const response = await createJulesIssue(octokit, owner, repo, title, body);
+      const response = await createJulesIssue(
+        octokit,
+        owner,
+        repo,
+        title,
+        body,
+      );
 
       setOpen(false);
       setTitle("");
       setBody("");
-      onSuccess?.();
+      onSuccess?.(response.data as unknown as GitHubIssue);
       router.refresh();
     } catch (err: any) {
       console.error("Failed to create issue:", err);
