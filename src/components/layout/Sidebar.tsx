@@ -12,9 +12,13 @@ import { cn } from "@/lib/utils";
 import { useUI } from "./UIContext";
 import { motion, AnimatePresence } from "framer-motion";
 
+import { RestEndpointMethodTypes } from "@octokit/rest";
+
+type ReposListResponse = RestEndpointMethodTypes["repos"]["listForAuthenticatedUser"]["response"]["data"];
+
 export function Sidebar() {
   const { data: session } = useSession();
-  const [repos, setRepos] = useState<any[]>([]);
+  const [repos, setRepos] = useState<ReposListResponse>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const params = useParams();
