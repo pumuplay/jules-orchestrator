@@ -83,30 +83,28 @@ export function RepoSelector() {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger
-        render={
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-[280px] justify-between bg-background/50 border-primary/20 hover:bg-primary/5 transition-all"
-          >
-            <div className="flex items-center gap-2 truncate">
-              {fullPath ? (
-                <>
-                  <Folder className="h-4 w-4 text-primary shrink-0" />
-                  <span className="truncate font-medium">{fullPath}</span>
-                </>
-              ) : (
-                <span className="text-muted-foreground">
-                  Select repository...
-                </span>
-              )}
-            </div>
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        }
-      />
+      <PopoverTrigger>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full sm:w-[280px] justify-between bg-background/50 border-primary/20 hover:bg-primary/5 transition-all"
+        >
+          <div className="flex items-center gap-2 truncate">
+            {fullPath ? (
+              <>
+                <Folder className="h-4 w-4 text-primary shrink-0" />
+                <span className="truncate font-medium">{fullPath}</span>
+              </>
+            ) : (
+              <span className="text-muted-foreground">
+                Select repository...
+              </span>
+            )}
+          </div>
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
       <PopoverContent className="w-[320px] p-0" align="start">
         <Command className="bg-background" shouldFilter={true}>
           <CommandInput

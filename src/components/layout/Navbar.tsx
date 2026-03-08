@@ -61,7 +61,7 @@ export function Navbar() {
           </div>
 
           {session && (
-            <div className="hidden md:flex items-center pl-6 border-l border-primary/10">
+            <div className="flex items-center pl-4 sm:pl-6 border-l border-primary/10 max-w-[140px] sm:max-w-none">
               <RepoSelector />
             </div>
           )}
