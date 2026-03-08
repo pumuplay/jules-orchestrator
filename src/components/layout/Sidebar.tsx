@@ -2,11 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Octokit } from "@octokit/rest";
 import { getGitHubClient, fetchRepos } from "@/lib/github";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
 import { Search, Folder, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
