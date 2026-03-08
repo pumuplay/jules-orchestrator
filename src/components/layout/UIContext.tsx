@@ -15,16 +15,21 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isTitleAbbreviated, setIsTitleAbbreviated] = useState(false);
 
-  // Persistence (optional, but good for UX)
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const savedSidebar = localStorage.getItem("sidebar-collapsed");
-    if (savedSidebar !== null) {
-      setIsSidebarCollapsed(savedSidebar === "true");
-    }
     const savedTitle = localStorage.getItem("title-abbreviated");
-    if (savedTitle !== null) {
-      setIsTitleAbbreviated(savedTitle === "true");
-    }
+
+    // Wrap in setTimeout to avoid synchronous state update during effect
+    setTimeout(() => {
+      if (savedSidebar !== null) {
+        setIsSidebarCollapsed(savedSidebar === "true");
+      }
+      if (savedTitle !== null) {
+        setIsTitleAbbreviated(savedTitle === "true");
+      }
+    }, 0);
   }, []);
 
   const toggleSidebar = () => {

@@ -23,6 +23,27 @@ export interface GitHubIssue {
   updated_at: string;
   comments: number;
   body?: string | null;
+  pull_request?: {
+    url: string;
+    html_url: string;
+    diff_url: string;
+    patch_url: string;
+  };
+}
+
+export interface GitHubRepo {
+  id: number;
+  name: string;
+  full_name: string;
+  owner: GitHubUser & { type: string };
+  html_url: string;
+}
+
+export interface GitHubOrg {
+  login: string;
+  id: number;
+  avatar_url: string;
+  description: string | null;
 }
 
 export const getGitHubClient = (accessToken: string) => {
@@ -45,7 +66,12 @@ export const ensureJulesLabel = async (
       name: JULES_LABEL,
     });
   } catch (error: unknown) {
-    if (typeof error === "object" && error !== null && "status" in error && error.status === 404) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "status" in error &&
+      error.status === 404
+    ) {
       await octokit.issues.createLabel({
         owner,
         repo,
@@ -77,19 +103,35 @@ export const createJulesIssue = async (
   });
 };
 
-export const fetchRepos = async (octokit: Octokit) => {
+export const fetchRepos = async (octokit: Octokit): Promise<GitHubRepo[]> => {
   const { data } = await octokit.repos.listForAuthenticatedUser({
     sort: "updated",
     per_page: 100,
   });
-  return data;
+  return data as unknown as GitHubRepo[];
+};
+
+export const fetchOrganizations = async (octokit: Octokit): Promise<GitHubOrg[]> => {
+  const { data } = await octokit.orgs.listForAuthenticatedUser({
+    per_page: 100,
+  });
+  return data as unknown as GitHubOrg[];
+};
+
+export const fetchOrgRepos = async (octokit: Octokit, org: string): Promise<GitHubRepo[]> => {
+  const { data } = await octokit.repos.listForOrg({
+    org,
+    sort: "updated",
+    per_page: 100,
+  });
+  return data as unknown as GitHubRepo[];
 };
 
 export const fetchIssues = async (
   octokit: Octokit,
   owner: string,
   repo: string,
-) => {
+): Promise<GitHubIssue[]> => {
   const { data } = await octokit.issues.listForRepo({
     owner,
     repo,
@@ -97,5 +139,20 @@ export const fetchIssues = async (
     sort: "updated",
     per_page: 50,
   });
-  return data;
+  return data as unknown as GitHubIssue[];
+};
+
+export const fetchPullRequests = async (
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+): Promise<GitHubIssue[]> => {
+  const { data } = await octokit.pulls.list({
+    owner,
+    repo,
+    state: "open",
+    sort: "updated",
+    per_page: 50,
+  });
+  return data as unknown as GitHubIssue[];
 };
