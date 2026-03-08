@@ -3,7 +3,7 @@
 import { useSession, signOut, signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, Github, Plus } from "lucide-react";
+import { LogOut, Github } from "lucide-react";
 
 export function Navbar() {
   const { data: session, status } = useSession();
