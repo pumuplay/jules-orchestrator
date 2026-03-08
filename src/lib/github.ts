@@ -1,4 +1,5 @@
 import { Octokit } from "@octokit/rest";
+import { RequestError } from "@octokit/request-error";
 
 export interface GitHubUser {
   login: string;
@@ -45,7 +46,7 @@ export const ensureJulesLabel = async (
       name: JULES_LABEL,
     });
   } catch (error: unknown) {
-    if (typeof error === "object" && error !== null && "status" in error && error.status === 404) {
+    if (error instanceof RequestError && error.status === 404) {
       await octokit.issues.createLabel({
         owner,
         repo,
