@@ -2,19 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Octokit } from "@octokit/rest";
 import { getGitHubClient, fetchRepos } from "@/lib/github";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
 import { Search, Folder, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 
+import { RestEndpointMethodTypes } from "@octokit/rest";
+
+type ReposListResponse = RestEndpointMethodTypes["repos"]["listForAuthenticatedUser"]["response"]["data"];
+
 export function Sidebar() {
   const { data: session } = useSession();
-  const [repos, setRepos] = useState<any[]>([]);
+  const [repos, setRepos] = useState<ReposListResponse>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const params = useParams();
