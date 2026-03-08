@@ -7,7 +7,6 @@ import {
   getGitHubClient,
   fetchRepos,
   fetchOrganizations,
-  searchUserRepos,
   GitHubRepo,
   GitHubOrg,
 } from "@/lib/github";
