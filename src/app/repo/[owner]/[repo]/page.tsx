@@ -1,11 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { getGitHubClient, fetchIssues, JULES_LABEL, GitHubIssue } from "@/lib/github";
+import {
+  getGitHubClient,
+  fetchIssues,
+  JULES_LABEL,
+  GitHubIssue,
+} from "@/lib/github";
 import { CreateIssueDialog } from "@/components/issues/CreateIssueDialog";
 import {
   Loader2,
@@ -18,7 +23,6 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -45,7 +49,7 @@ export default function RepoPage() {
         setLoading(false);
       }
     }
-  };
+  }, [session, owner, repo]);
 
   useEffect(() => {
     loadIssues();
