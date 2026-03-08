@@ -104,16 +104,20 @@ export const createJulesIssue = async (
 };
 
 export const fetchRepos = async (octokit: Octokit): Promise<GitHubRepo[]> => {
+  // listForAuthenticatedUser returns repos the user has access to,
+  // including those in organizations where they are a member.
   const { data } = await octokit.repos.listForAuthenticatedUser({
     sort: "updated",
     per_page: 100,
+    affiliation: "owner,collaborator,organization_member",
   });
   return data as unknown as GitHubRepo[];
 };
 
 export const searchUserRepos = async (octokit: Octokit, query: string): Promise<GitHubRepo[]> => {
+  // We use search.repos but ensure it's limited to the user's visible repos
   const { data } = await octokit.search.repos({
-    q: `${query} user:@me`,
+    q: `${query} in:name is:internal,public,private`,
     sort: "updated",
     per_page: 50,
   });
