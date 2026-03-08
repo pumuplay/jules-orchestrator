@@ -61,12 +61,10 @@ export function CreateIssueDialog({
       setBody("");
       onSuccess?.(response.data as unknown as GitHubIssue);
       router.refresh();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to create issue:", err);
-      setError(
-        err?.message ||
-          "An unexpected error occurred while creating the issue.",
-      );
+      const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred while creating the issue.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
