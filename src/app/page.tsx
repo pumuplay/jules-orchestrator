@@ -41,7 +41,7 @@ export default function Home() {
             </div>
             <h1 className="text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.1]">
               Orchestrate Your <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-400 to-indigo-500">
                 Google Jules workflow
               </span>
             </h1>
@@ -61,7 +61,7 @@ export default function Home() {
             <Button
               size="lg"
               onClick={() => signIn("github")}
-              className="h-14 px-8 text-lg font-bold gap-3 group relative overflow-hidden transition-all hover:shadow-[0_0_20px_rgba(57,255,20,0.3)]"
+              className="h-14 px-8 text-lg font-bold gap-3 group relative overflow-hidden transition-all hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]"
             >
               <GithubIcon className="w-6 h-6 transition-transform group-hover:scale-110" />
               Get Started with GitHub
@@ -103,9 +103,13 @@ export default function Home() {
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
         <main className="flex-1 p-8 flex flex-col items-center justify-center text-center space-y-6">
-          <div className="bg-primary/10 p-4 rounded-2xl border border-primary/20 mb-4 animate-in fade-in zoom-in duration-500">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-primary/10 p-6 rounded-3xl border border-primary/20 mb-4 shadow-[0_0_30px_rgba(168,85,247,0.1)]"
+          >
             <GithubIcon className="w-16 h-16 text-primary" />
-          </div>
+          </motion.div>
           <h2 className="text-3xl font-bold tracking-tight">
             Select a Repository
           </h2>
