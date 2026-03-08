@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import {
   getGitHubClient,
   fetchRepos,
   fetchOrganizations,
+  searchRepos,
   GitHubRepo,
   GitHubOrg,
 } from "@/lib/github";
@@ -24,7 +25,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronsUpDown, Folder, Building2, User } from "lucide-react";
+import { Check, ChevronsUpDown, Folder, Building2, User, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function RepoSelector() {
@@ -34,6 +35,8 @@ export function RepoSelector() {
   const [open, setOpen] = useState(false);
   const [repos, setRepos] = useState<GitHubRepo[]>([]);
   const [orgs, setOrgs] = useState<GitHubOrg[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searching, setSearching] = useState(false);
 
   const currentOwner = params.owner as string;
   const currentRepo = params.repo as string;
@@ -56,6 +59,27 @@ export function RepoSelector() {
       }
     }
     loadInitialData();
+  }, [session?.accessToken]);
+
+  const handleSearch = useCallback(async (query: string) => {
+    setSearchQuery(query);
+    if (query.length < 3) return;
+
+    setSearching(true);
+    try {
+      const octokit = getGitHubClient(session?.accessToken as string);
+      const searchResults = await searchRepos(octokit, query);
+      // Merge unique results
+      setRepos((prev) => {
+        const existingIds = new Set(prev.map((r) => r.id));
+        const newOnes = searchResults.filter((r) => !existingIds.has(r.id));
+        return [...prev, ...newOnes];
+      });
+    } catch (error) {
+      console.error("Search failed:", error);
+    } finally {
+      setSearching(false);
+    }
   }, [session?.accessToken]);
 
   const onSelect = (path: string) => {
@@ -88,9 +112,17 @@ export function RepoSelector() {
         }
       />
       <PopoverContent className="w-[320px] p-0" align="start">
-        <Command className="bg-background">
-          <CommandInput placeholder="Search repositories..." />
+        <Command className="bg-background" shouldFilter={!searchQuery}>
+          <CommandInput
+            placeholder="Search repositories..."
+            onValueChange={handleSearch}
+          />
           <CommandList>
+            {searching && (
+              <div className="p-4 flex items-center justify-center">
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              </div>
+            )}
             <CommandEmpty>No repository found.</CommandEmpty>
             <CommandGroup heading="Personal Repositories">
               {repos
