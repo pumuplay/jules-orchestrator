@@ -5,7 +5,6 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Button } from "@/components/ui/button";
 import {
-  Github,
   Rocket,
   Github as GithubIcon,
   ShieldCheck,
