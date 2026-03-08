@@ -81,3 +81,14 @@ jobs:
           echo "- **App URL**: [${{ secrets.NEXTAUTH_URL }}](${{ secrets.NEXTAUTH_URL }})" >> $GITHUB_STEP_SUMMARY
           echo "- **GitHub Image**: [${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}](https://github.com/${{ github.repository }}/pkgs/container/jules-orchestrator)" >> $GITHUB_STEP_SUMMARY
           echo "- **Workflow Triggered By**: \`${{ github.actor }}\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify Discord
+        if: success()
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: info
+          details: "🚀 **Jules Orchestrator** has been successfully deployed!"
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          color: "#00ff00"
+          username: "Jules Orchestrator CI"
+          avatarUrl: "https://github.com/github.png"
