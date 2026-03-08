@@ -1,0 +1,18 @@
+$ next dev
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+
+✓ Starting...
+✓ Ready in 1119ms
+○ Compiling / ...
+ GET / 200 in 8.6s (compile: 7.8s, render: 890ms)
+[next-auth][warn][NEXTAUTH_URL]
+https://next-auth.js.org/warnings#nextauth_url
+[next-auth][warn][NO_SECRET]
+https://next-auth.js.org/warnings#no_secret
+ GET /api/auth/session 200 in 4.0s (compile: 3.9s, render: 68ms)
+ GET / 200 in 280ms (compile: 83ms, render: 197ms)
+ GET /api/auth/session 200 in 47ms (compile: 35ms, render: 11ms)
+ GET / 200 in 263ms (compile: 81ms, render: 182ms)
+ GET /api/auth/session 200 in 47ms (compile: 36ms, render: 11ms)
