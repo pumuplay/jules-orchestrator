@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -33,11 +33,13 @@ import {
   Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export function RepoSelector() {
   const { data: session } = useSession();
   const params = useParams();
   const router = useRouter();
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [repos, setRepos] = useState<GitHubRepo[]>([]);
   const [orgs, setOrgs] = useState<GitHubOrg[]>([]);
@@ -100,7 +102,7 @@ export function RepoSelector() {
               <span className="truncate font-medium">{fullPath}</span>
             </>
           ) : (
-            <span className="text-muted-foreground">Select repository...</span>
+            <span className="text-muted-foreground">{t("selectRepository")}</span>
           )}
         </div>
         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -108,7 +110,7 @@ export function RepoSelector() {
       <PopoverContent className="w-[320px] p-0" align="start">
         <Command className="bg-background" shouldFilter={true}>
           <CommandInput
-            placeholder="Search your repositories..."
+            placeholder={t("searchRepo")}
             onValueChange={handleSearch}
           />
           <CommandList>
@@ -117,9 +119,9 @@ export function RepoSelector() {
                 <Loader2 className="h-4 w-4 animate-spin text-primary" />
               </div>
             )}
-            <CommandEmpty>No repository found.</CommandEmpty>
+            <CommandEmpty>{t("noReposFound")}</CommandEmpty>
 
-            <CommandGroup heading="Personal Repositories">
+            <CommandGroup heading={t("personalRepositories")}>
               {repos
                 .filter((r) => !r.owner.type.includes("Organization"))
                 .map((repo) => (
