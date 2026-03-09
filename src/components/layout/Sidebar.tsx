@@ -13,12 +13,14 @@ import { useParams, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useUI } from "./UIContext";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export function Sidebar() {
   const { data: session } = useSession();
   const params = useParams();
   const pathname = usePathname();
   const { isSidebarCollapsed } = useUI();
+  const { t } = useLanguage();
 
   const owner = params.owner as string;
   const repo = params.repo as string;
@@ -27,25 +29,25 @@ export function Sidebar() {
 
   const navItems = [
     {
-      name: "Kanban Board",
+      name: t("kanbanBoard"),
       icon: Kanban,
       href: owner && repo ? `/repo/${owner}/${repo}` : "#",
       disabled: !owner || !repo,
     },
     {
-      name: "Activity",
+      name: t("activity"),
       icon: History,
       href: "#",
       disabled: true,
     },
     {
-      name: "Discussions",
+      name: t("discussions"),
       icon: MessageSquare,
       href: "#",
       disabled: true,
     },
     {
-      name: "Settings",
+      name: t("settings"),
       icon: Settings,
       href: "#",
       disabled: true,
@@ -101,8 +103,8 @@ export function Sidebar() {
           <Github className="h-5 w-5 shrink-0" />
           {!isSidebarCollapsed && (
             <div className="flex flex-col overflow-hidden">
-              <span className="text-xs font-medium truncate">GitHub Status</span>
-              <span className="text-[10px] text-green-500 font-medium">Operational</span>
+              <span className="text-xs font-medium truncate">{t("githubStatus")}</span>
+              <span className="text-[10px] text-green-500 font-medium">{t("operational")}</span>
             </div>
           )}
         </div>

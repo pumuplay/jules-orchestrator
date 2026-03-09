@@ -11,9 +11,11 @@ import {
   Sparkles,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function Home() {
   const { data: session, status } = useSession();
+  const { t } = useLanguage();
 
   if (status === "loading") {
     return (
@@ -110,15 +112,14 @@ export default function Home() {
             <GithubIcon className="w-16 h-16 text-primary" />
           </motion.div>
           <h2 className="text-3xl font-bold tracking-tight">
-            Select a Repository
+            {t("selectARepo")}
           </h2>
           <p className="text-muted-foreground max-w-md">
-            Choose a repository from the navbar to view and manage its issues.
-            New issues created here will be automatically tagged with the{" "}
+            {t("chooseRepoDescPrefix")}
             <span className="text-primary font-mono bg-primary/10 px-1.5 py-0.5 rounded">
               jules
-            </span>{" "}
-            label.
+            </span>
+            {t("chooseRepoDescSuffix")}
           </p>
         </main>
       </div>

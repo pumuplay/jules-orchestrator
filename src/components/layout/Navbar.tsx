@@ -8,10 +8,12 @@ import { useUI } from "./UIContext";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { RepoSelector } from "./RepoSelector";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export function Navbar() {
   const { data: session, status } = useSession();
   const { toggleSidebar, isTitleAbbreviated } = useUI();
+  const { language, setLanguage, t } = useLanguage();
 
   if (status === "loading") return null;
 
@@ -68,6 +70,14 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setLanguage(language === 'en' ? 'th' : 'en')}
+            className="text-xs font-medium w-12 border border-primary/20 hover:bg-primary/10 transition-colors"
+          >
+            {language === 'en' ? 'TH' : 'EN'}
+          </Button>
           {session ? (
             <div className="flex items-center gap-3">
               <div className="hidden sm:flex flex-col items-end text-xs">
@@ -97,7 +107,7 @@ export function Navbar() {
               className="gap-2 shadow-[0_0_15px_rgba(168,85,247,0.2)] hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-all h-9"
             >
               <Github className="h-4 w-4" />
-              Login with GitHub
+              {t("loginWithGithub")}
             </Button>
           )}
         </div>

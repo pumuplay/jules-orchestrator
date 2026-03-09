@@ -12,6 +12,7 @@ import {
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface KanbanBoardProps {
   issues: GitHubIssue[];
@@ -19,6 +20,8 @@ interface KanbanBoardProps {
 }
 
 export function KanbanBoard({ issues, pullRequests }: KanbanBoardProps) {
+  const { t } = useLanguage();
+
   // Column 1: Open issues (not labeled with JULES_LABEL and not PRs)
   const openIssues = issues.filter(
     (issue) =>
@@ -47,19 +50,19 @@ export function KanbanBoard({ issues, pullRequests }: KanbanBoardProps) {
   return (
     <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 p-6 h-full overflow-hidden">
       <KanbanColumn
-        title="Open Issues"
+        title={t("openIssues")}
         count={openIssues.length}
         issues={openIssues}
         type="issue"
       />
       <KanbanColumn
-        title="Jules is Working"
+        title={t("julesIsWorking")}
         count={julesIssues.length}
         issues={julesIssues}
         type="jules"
       />
       <KanbanColumn
-        title="Pull Requests"
+        title={t("prs")}
         count={julesPRs.length}
         issues={julesPRs}
         type="pr"
@@ -79,6 +82,8 @@ function KanbanColumn({
   issues: GitHubIssue[];
   type: "issue" | "jules" | "pr";
 }) {
+  const { t } = useLanguage();
+
   return (
     <div className="flex flex-col min-h-0 h-full bg-accent/20 rounded-2xl border border-primary/5">
       <div className="p-4 flex items-center justify-between shrink-0">
@@ -101,7 +106,7 @@ function KanbanColumn({
           {issues.length === 0 && (
             <div className="py-12 flex flex-col items-center justify-center text-center opacity-30">
               <div className="h-8 w-8 rounded-full border-2 border-dashed border-current mb-2" />
-              <p className="text-xs font-medium">No items</p>
+              <p className="text-xs font-medium">{t("noItems")}</p>
             </div>
           )}
         </div>

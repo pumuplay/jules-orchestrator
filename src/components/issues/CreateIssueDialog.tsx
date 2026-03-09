@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { RequestError } from "@octokit/request-error";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface CreateIssueDialogProps {
   owner: string;
@@ -40,6 +41,7 @@ export function CreateIssueDialog({
   const [body, setBody] = useState("");
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,17 +83,17 @@ export function CreateIssueDialog({
       <DialogTrigger>
         <Button className="gap-2 shadow-[0_0_15px_rgba(57,255,20,0.15)] hover:shadow-[0_0_25px_rgba(57,255,20,0.25)] transition-all">
           <Plus className="h-4 w-4" />
-          Create New Issue
+          {t("createNewIssue")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] border-primary/20 bg-background/95 backdrop-blur-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Github className="h-5 w-5 text-primary" />
-            New GitHub Issue
+            {t("newGithubIssue")}
           </DialogTitle>
           <DialogDescription>
-            Create an issue in{" "}
+            {t("createAnIssueIn")}{" "}
             <span className="text-foreground font-medium">
               {owner}/{repo}
             </span>
@@ -106,7 +108,7 @@ export function CreateIssueDialog({
               className="bg-destructive/10 border-destructive/20 text-destructive-foreground animate-in fade-in zoom-in duration-200"
             >
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
+              <AlertTitle>{t("error")}</AlertTitle>
               <AlertDescription className="text-xs opacity-90">
                 {error}
               </AlertDescription>
@@ -115,10 +117,10 @@ export function CreateIssueDialog({
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title">{t("issueTitle")}</Label>
               <Input
                 id="title"
-                placeholder="Issue title..."
+                placeholder={t("issueTitlePlaceholder")}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
@@ -126,10 +128,10 @@ export function CreateIssueDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="body">Description</Label>
+              <Label htmlFor="body">{t("issueDescription")}</Label>
               <Textarea
                 id="body"
-                placeholder="Describe the issue..."
+                placeholder={t("issueDescriptionPlaceholder")}
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 className="min-h-[150px] bg-background/50 border-primary/10 focus-visible:ring-primary/30"
@@ -138,7 +140,7 @@ export function CreateIssueDialog({
             <div className="flex items-center gap-2 pt-2">
               <span className="text-xs text-muted-foreground uppercase tracking-widest font-semibold flex items-center gap-1.5">
                 <Sparkles className="h-3 w-3 text-primary" />
-                Auto-assigned:
+                {t("autoAssigned")}
               </span>
               <Badge
                 variant="secondary"
@@ -156,7 +158,7 @@ export function CreateIssueDialog({
               onClick={() => setOpen(false)}
               disabled={loading}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               type="submit"
@@ -166,10 +168,10 @@ export function CreateIssueDialog({
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating...
+                  {t("creating")}
                 </>
               ) : (
-                "Create Issue"
+                t("createIssue")
               )}
             </Button>
           </DialogFooter>
